@@ -1,5 +1,3 @@
-
-
 document.addEventListener('DOMContentLoaded', () => {
     // Elementos do Jogo
     const personagem = document.querySelector('.personagem');
@@ -41,6 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const bossVidaDisplay = document.getElementById('boss-vida');
     const mensagemBoss = document.getElementById('mensagemBoss')
     const detalheBoss = document.getElementById('detalheBoss')
+
+    const fundo1 = document.getElementById('arvore1')
+    const fundo2 = document.getElementById('montanha2')
     
     
     let proximoBoss = 100;       // pontuação em que o próximo boss aparece
@@ -570,18 +571,17 @@ personagem.addEventListener('animationend', (e) => {
     // }
     function atualizarCenario() {
         // Define a classe de dificuldade baseada na velocidade atual
-        let nivelDificuldade = 'facil';
         // difficulty.value = 'Fácil';
         
+        let nivelDificuldade = 'facil';
         if (velocidadeObstaculo === 1.5) {
             nivelDificuldade = 'medio';
-            // difficulty.value = 'Médio';
-            
+            fundo2.style.visibility = 'hidden';
+            // difficulty.value = 'Médio';    
         } else if (velocidadeObstaculo === 1) {
             nivelDificuldade = 'dificil';
             // difficulty.value = 'Difícil';
         }
-
         // Aplica a classe combinada no fundo (Ex: "bg-pikachu-facil", "bg-mario-dificil")
         gameBoard.className = `game-board running bg-${personagemAtual}-${nivelDificuldade}`;
     }
@@ -1019,9 +1019,9 @@ function checarMoeda() {
         if(contadorVida >= 3){
             btnComprarVida.disabled;
         }
-        // btnComprarMoeda.disabled = contadorMoeda >= 3;
-        // btnComprarPulo.disabled = contadorPulo >= 3;
-        // btnComprarVida.disabled = contadorVida >= 3;
+        btnComprarMoeda.disabled = nivelMoeda >= 3;
+        btnComprarPulo.disabled = nivelPulo = 3;
+        btnComprarVida.disabled = nivelVida >= 3;
 
     }
 
@@ -1049,15 +1049,12 @@ function checarMoeda() {
 
     btnComprarMoeda.addEventListener('click', () => {
         comprar('moeda');
-        contadorMoeda += 1;    
     });
     btnComprarPulo.addEventListener('click', () => {
         comprar('pulo')
-        contadorPulo += 1
     });
     btnComprarVida.addEventListener('click', () => {
         comprar('vida')
-        contadorMoeda += 1
     });
 
     btnJogarLoja.addEventListener('click', () => {

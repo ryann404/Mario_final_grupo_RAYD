@@ -56,7 +56,7 @@
 
         
         <main class="game-board" id="game-board">
-            <div class="camada montanha-fundo"  id="montanha1"></div>
+            <div class="camada montanha-fundo"  id="arvore1"></div>
             <div class="camada montanha-frente" id="montanha2"></div>
             <div class="camada chao" id="chao"></div>
             <img src="assets/clouds.png" class="clouds" alt="Nuvens">

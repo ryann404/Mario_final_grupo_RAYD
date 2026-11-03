@@ -95,11 +95,19 @@ body {
 }
 
 .montanha-fundo {                 
-    height: 600px;
-    background-image: url('../assets/montanha1.png');
-    --n: 1;
+    height: 900px;
+    bottom: 0;
+    background-image: url('../assets/colinas.png');
+    --n: 2;
 }
-
+.montanha-frente {                /* mais perto: vai p/ esquerda */
+    bottom: 10px;
+    height: 200px;
+    margin-left: 30px;
+    display: inline;
+    background-image: url('../assets/arvore1.png');
+    --n: 5;
+}
 
 .chao {               
     position: absolute;            
@@ -120,7 +128,7 @@ body {
 
 .game-board.running .montanha-fundo  { animation: camada-direita  120s linear infinite; }
 .game-board.running .montanha-frente { animation: camada-esquerda  25s linear infinite; }
-.game-board.running .chao            { animation: camada-esquerda 2s linear infinite; }
+.game-board.running .chao            { animation: camada-esquerda var(--vel-chao, 2s) linear infinite; }
 
 /* Elementos do Jogo */
 .obstaculo {
