@@ -7,17 +7,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const scoreDisplay = document.getElementById('score-display');
     const jumpTip = document.getElementById('jump-tip');
     // ===== ÁUDIOS =====
-    const somMoeda = new Audio('assets/moeda.wav');
-    const somDano = new Audio('assets/dano.wav');
-    const somMorrendo = new Audio('assets/morrendo.wav');
-    const somPulo = new Audio('assets/pulando.wav');
-    const musicaFundo = new Audio('assets/videoplayback.wav');
+    const somMoeda = new Audio('./assets/moeda.mp3');
+    const somDano = new Audio('./assets/dano.mp3');
+    const somMorrendo = new Audio('./assets/morrendo.mp3');
+    const somPulo = new Audio('./assets/pulando.mp3');
+    const musicaFundo = new Audio('./assets/videoplayback.mp3');
+
     musicaFundo.loop = true;
-    musicaFundo.volume = 0.4;
+    musicaFundo.volume = 0.35;
+
+    // Pré-carrega todos os áudios
+    [somMoeda, somDano, somMorrendo, somPulo, musicaFundo].forEach(audio => {
+        audio.load();
+        audio.volume = audio === musicaFundo ? 0.35 : 0.7;
+    });
 
     function tocarSom(audio) {
+        if (!audio) return;
         audio.currentTime = 0;
-        audio.play().catch(() => { });
+        const promise = audio.play();
+        if (promise !== undefined) {
+            promise.catch(erro => {
+                console.warn('Áudio bloqueado ou erro:', erro);
+            });
+        }
     }
 
     const loja = document.getElementById('loja');
@@ -199,6 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         resetElements();
         ultimoRaio = 0; // raio começa pronto
+        cooldownRaio = personagemAtual === 'harry' ? 15000 : cooldownBase; // Harry: 15s
         segundaChance = false;
 
         barraCooldown.style.display = (personagemAtual === 'pikachu' || personagemAtual === 'harry') ? 'block' : 'none';
@@ -260,24 +274,49 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function jump() {
-        if (!isPlaying) return;
-        if (voando) return;
+        if (!isPlaying || voando) return;
         if (jumpTip) jumpTip.style.opacity = '0';
 
-        // Pikachu: um pulo só
+        // Pikachu: só 1 pulo
+        if (personagemAtual === 'pikachu') {
+            if (personagem.classList.contains('jump')) return;
+            personagem.classList.add('jump');
+            tocarSom(somPulo);
+            return;
+        }
+
+        // Mario: máximo 2 pulos
+        if (personagemAtual === 'mario') {
+            if (pulosFeitos >= 2) return;
+            pulosFeitos += 1;
+
+            if (pulosFeitos === 1) {
+                personagem.classList.add('jump');
+            } else {
+                personagem.classList.remove('jump');
+                personagem.classList.add('jump-duplo');
+            }
+            tocarSom(somPulo);
+            return;
+        }
+
+        // Outros personagens (Harry, Naruto, Jerry) → pulo normal
         if (personagem.classList.contains('jump')) return;
         personagem.classList.add('jump');
         tocarSom(somPulo);
-        return;
     }
 
-    // Mario: no máximo 2 pulos
-    if (pulosFeitos >= 2) return;
-    pulosFeitos += 1;
 
     personagem.addEventListener('animationend', (e) => {
         if (e.animationName === 'jump-animation') {
             personagem.classList.remove('jump');
+            if (personagemAtual === 'mario') pulosFeitos = 0;
+        }
+        if (e.animationName === 'jump-duplo-animation') {
+            personagem.classList.remove('jump-duplo');
+            personagem.style.bottom = '0px';
+            personagem.src = imagemPersonagem;
+            pulosFeitos = 0;
         }
     });
 
@@ -1012,7 +1051,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     function atualizarBarraCooldown() {
-        let porcentagem = ((Date.now() - ultimoRaio) / cooldownRaio) * 100;
+        let porcentagem;
+        if (personagemAtual === 'harry' && voando) {
+            // Harry voando: a barra esvazia conforme o tempo de voo (5s) acaba
+            porcentagem = ((fimVoo - Date.now()) / 5000) * 100;
+        } else {
+            // Pikachu e Harry em cooldown: a barra enche
+            porcentagem = ((Date.now() - ultimoRaio) / cooldownRaio) * 100;
+        }
         if (porcentagem > 100) porcentagem = 100;
         if (porcentagem < 0) porcentagem = 0;
         barraCooldownFill.style.width = `${porcentagem}%`;
@@ -1110,7 +1156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ===== POWER-UPS =====
     function agendarPowerup() {
         clearTimeout(timerPowerup);
-        const espera = personagemAtual === 'jerry' ? 40000 : 15000 + Math.random() * 5000;
+        const espera = personagemAtual === 'jerry' ? 15000 : 10000;
         timerPowerup = setTimeout(lancarPowerup, espera);
     }
 
@@ -1169,10 +1215,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // JERRY: queijo recupera 1 coração (não passa do máximo)
         if (personagemAtual === 'jerry') {
-            if (vidas < 1 + nivelVida) {
-                vidas += 1;
-                livesDisplay.textContent = vidas;
-            }
+            vidas += 1;
+            livesDisplay.textContent = vidas;
             agendarPowerup();
             return;
         }

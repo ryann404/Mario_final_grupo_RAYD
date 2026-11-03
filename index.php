@@ -138,9 +138,9 @@
         <!-- <h3 class="infoCharacterMario">Habilidade "Pulo Duplo": Dá um segundo salto, podendo te dar vantagens contra ataques altos e ao pular os obstáculos</h3> -->
         <!-- EU COLOQUEI PULO DUPLO, MAS DO ND ELE TRAVOU -->
         <h3 class="infoCharacterMario">Gordinho Gostoso</h3>
-        <h3 class="infoCharacterHarry">Habilidade "Vassoura Voadora": voa por 5s (cooldown de 15s) e você controla a altura. Power-up: varinha muda o cenário e nada aparece por 5s.</h3>
-        <h3 class="infoCharacterNaruto">Habilidade "Clone das Sombras": ao perder a última vida, ganha uma segunda chance. Power-up: kunai (tecla X) remove um cano ou tira 1 vida do boss.</h3>
-        <h3 class="infoCharacterJerry">Habilidade "Queijo": a cada 40s aparece um queijo que recupera 1 coração.</h3>
+        <h3 class="infoCharacterHarry">Habilidade "Vassoura Voadora": voa por 5s (cooldown de 15s) e você controla a altura.</h3>
+        <h3 class="infoCharacterNaruto">Habilidade "Clone das Sombras": ao perder a última vida, ganha uma segunda chance.</h3>
+        <h3 class="infoCharacterJerry">Habilidade "Queijo": a cada 15s aparece um queijo que recupera 1 coração.</h3>
 
         <button type="button" class="btn btn-primary" id="btn-confirmar-personagem">
             CONFIRMAR

@@ -76,7 +76,7 @@ body {
     margin: 0 auto;
     position: relative;
     overflow: hidden;
-    background-image: url(../assets/fundoPokemon.jpg);
+    /* background-image: url(../assets/fundoPokemon.jpg); */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     cursor: pointer;
 }
@@ -97,7 +97,7 @@ body {
 .montanha-fundo {                 
     height: 900px;
     bottom: 0;
-    background-image: url('../assets/colinas.png');
+    /* background-image: url('../assets/colinas.png'); */
     --n: 2;
 }
 .montanha-frente {                /* mais perto: vai p/ esquerda */
@@ -732,7 +732,7 @@ body {
 /* Cenários do Jerry */
 .game-board.bg-jerry-facil   { background-image: url('../assets/jerry-fundo-facil.png'); }
 .game-board.bg-jerry-medio   { background-image: url('../assets/jerry-fundo-medio.png'); }
-.game-board.bg-jerry-dificil { background-image: url('../assets/jerry-fundo-dificil.png'); }
+.game-board.bg-jerry-dificil { background-image: url('../assets/jerry-fundo-dificil.webp'); }
 .moeda {
     position: absolute;
     right: -80px;
