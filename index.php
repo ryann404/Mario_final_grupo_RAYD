@@ -71,6 +71,7 @@
             <img src="assets/ataqueBoss.png" class="ataque-boss" id="ataque-boss" alt="Ataque do Boss">
             <div class="item-boss" id="item-boss"></div>
             <span class="boss-vida" id="boss-vida"></span>
+            <h1 class="mensagemBoss" id="mensagemBossAparecerBoss">SE PREPARE PARA O BOSS!!</h1>
             <h1 class="mensagemBoss" id="mensagemBoss">O BOSS APARECEU!</h1>
             <span class="detalheBoss" id="detalheBoss">Colete os orbes azuis para derrotá-lo!</span>
             
@@ -132,6 +133,8 @@
         <button type="button" class="btnSelect" id="btn-comprar-vida">
             ❤️ +1 coração de vida - <span id="preco-vida">30 moedas (0/3)</span>
         </button>
+        
+        <h3 class="textoBloqueado">Nao podi</h3>
 
 
 
@@ -196,6 +199,7 @@
                                 <th>POS</th>
                                 <th>JOGADOR</th>
                                 <th>PONTUAÇÃO</th>
+                                <th>MOEDAS</th>
                             </tr>
                         </thead>
                         <tbody id="ranking-body">
@@ -207,11 +211,13 @@
                                         </td>
                                         <td><strong><?= htmlspecialchars($row['nome']) ?></strong></td>
                                         <td><?= (int)$row['pontos'] ?> pts</td>
+                                        <td><?= (int)$row['pontos'] ?> pts</td>
+                                        <td>🪙 <?= (int)$row['moedas'] ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="3" class="loading-cell">Nenhuma pontuação gravada ainda. Jogue para ser o 1º!</td>
+                                    <td colspan="4" class="loading-cell">Nenhuma pontuação gravada ainda. Jogue para ser o 1º!</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>

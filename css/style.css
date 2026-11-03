@@ -106,7 +106,7 @@ body {
     margin-left: 30px;
     display: inline;
     background-image: url('../assets/arvore1.png');
-    --n: 5;
+    --n: 6;
 }
 
 .chao {               
@@ -811,9 +811,19 @@ body {
     z-index: 15;
     pointer-events: none;
 }
+.textoBloqueado{
+    visibility: hidden;
+}
 .btnSelect:disabled {
     opacity: 0.4;
     cursor: not-allowed;
+}
+.btnSelect:disabled:hover{
+   .textoBloqueado{
+        visibility: visible;
+        top: 30px;
+        font-size: 90px;
+    }
 }
 /* botao desativado */
 
@@ -845,10 +855,10 @@ body {
     position: absolute;
     right: -80px;
     bottom: 20px;
-    width: 40px;
-    height: 40px;
+    height: 90px;
     object-fit: contain;
     z-index: 6;
+    width: 90px;
 }
 .powerup.selected{
     border-color: #ffcc00;
@@ -918,10 +928,10 @@ body {
 
 .detalheBoss {
     top: calc(25% + 70px);
-    font-size: 13px;
     line-height: 1.7;
-    color: #7fdcff;
+    color: #4f11e1;
     text-shadow: 2px 2px 0 #000;
+    font-size: 20px;
 }
 
 @keyframes pulsar-boss {

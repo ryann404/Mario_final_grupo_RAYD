@@ -42,8 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const fundo1 = document.getElementById('arvore1')
     const fundo2 = document.getElementById('montanha2')
-    
-    
+
+
     let proximoBoss = 100;       // pontuação em que o próximo boss aparece
     let ignorarColisaoAte = 0;   // se este "let" já existir mais abaixo no arquivo, apague um dos dois
 
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let duracaoAtaque = 2;
     let pausaAtaque = 800;
     let pausaItem = 1500;
-    
+
     let bossAtivo = false;
     let bossVida = 3;
     let bossFeitos = 0;       // quantos bosses já foram derrotados
@@ -60,20 +60,20 @@ document.addEventListener('DOMContentLoaded', () => {
     let timerBoss = null;
     let timerItem = null;
 
-    let velocidadeObstaculo = 2; 
+    let velocidadeObstaculo = 2;
     let proximaVelocidade = 2;
 
     let imagemPersonagem = 'assets/Running-Pikachu-GIF.webp';
     let imagemMorte = 'assets/pikachuDerrotado.jpg';
     let imagemObstaculo = 'assets/pedra.png';
-    
-    let personagemAtual = 'pikachu'; 
+
+    let personagemAtual = 'pikachu';
 
     let contadorMoeda = 0;
     let contadorPulo = 0;
     let contadorVida = 0;
-    
-    
+
+
 
     const btnPikachu = document.getElementById('btn-pikachu');
     const btnMario = document.getElementById('btn-mario');
@@ -134,59 +134,59 @@ document.addEventListener('DOMContentLoaded', () => {
     /**
      * Inicia uma nova rodada
      */
-function startGame() {
-    moedas = 0;
-    coinsDisplay.textContent = '0';
-    
+    function startGame() {
+        moedas = 0;
+        coinsDisplay.textContent = '0';
 
-    vidas = 1 + nivelVida;
-    livesDisplay.textContent = '❤️ ' + vidas;
-    multiplicadorMoeda = 1.5 ** nivelMoeda;
-    const alturaPulo = 1.2 ** nivelPulo;
-    const tempoPulo = Math.round(650 * Math.sqrt(alturaPulo)); // mais alto = um pouco mais de tempo no ar
-    personagem.style.setProperty('--pulo', alturaPulo);
-    personagem.style.setProperty('--tempo-pulo', tempoPulo + 'ms');
-    personagem.style.setProperty('--tempo-pulo-duplo', Math.round(tempoPulo * 1.35) + 'ms');
-    
-    clearInterval(gameLoop);
-    clearInterval(scoreLoop);
 
-    isPlaying = true;
-    score = 0;
-    velocidadeObstaculo = 2;
-    proximaVelocidade = 2;
+        vidas = 1 + nivelVida;
+        livesDisplay.textContent = vidas;
+        multiplicadorMoeda = 1.5 ** nivelMoeda;
+        const alturaPulo = 1.2 ** nivelPulo;
+        const tempoPulo = Math.round(650 * Math.sqrt(alturaPulo)); // mais alto = um pouco mais de tempo no ar
+        personagem.style.setProperty('--pulo', alturaPulo);
+        personagem.style.setProperty('--tempo-pulo', tempoPulo + 'ms');
+        personagem.style.setProperty('--tempo-pulo-duplo', Math.round(tempoPulo * 1.35) + 'ms');
 
-    resetElements();
-    ultimoRaio = 0; // raio começa pronto
-    barraCooldown.style.display = personagemAtual === 'pikachu' ? 'block' : 'none';
-    // se for o pikachu, tem barra, se for outro personagem, nao tem barra
-    
-    resetBoss();
-    bossFeitos = 0;
-    proximoBoss = 100;
-    atualizarCenario();
-    
-    clearTimeout(timerPowerup);
-    esconderPowerup();
-    encerrarPowerup();
-    agendarPowerup();
+        clearInterval(gameLoop);
+        clearInterval(scoreLoop);
 
-    scoreDisplay.textContent = '0';
-    hudPlayerName.textContent = currentPlayer || 'Jogador';
+        isPlaying = true;
+        score = 0;
+        velocidadeObstaculo = 2;
+        proximaVelocidade = 2;
 
-    gameBoard.classList.add('running');
-    reiniciarObstaculo(); // cano começa limpo e com 1s de folga (já reinicia a moeda também)
+        resetElements();
+        ultimoRaio = 0; // raio começa pronto
+        barraCooldown.style.display = personagemAtual === 'pikachu' ? 'block' : 'none';
+        // se for o pikachu, tem barra, se for outro personagem, nao tem barra
 
-    scoreLoop = setInterval(() => {
-        if (isPlaying && !bossAtivo) { // durante o boss o placar congela
-            score += 1;
-            scoreDisplay.textContent = score;
-            verificarBoss();
-        }
-    }, 100);
+        resetBoss();
+        bossFeitos = 0;
+        proximoBoss = 100;
+        atualizarCenario();
 
-    gameLoop = setInterval(checkCollision, 10);
-}
+        clearTimeout(timerPowerup);
+        esconderPowerup();
+        encerrarPowerup();
+        agendarPowerup();
+
+        scoreDisplay.textContent = '0';
+        hudPlayerName.textContent = currentPlayer || 'Jogador';
+
+        gameBoard.classList.add('running');
+        reiniciarObstaculo(); // cano começa limpo e com 1s de folga (já reinicia a moeda também)
+
+        scoreLoop = setInterval(() => {
+            if (isPlaying && !bossAtivo) { // durante o boss o placar congela
+                score += 1;
+                scoreDisplay.textContent = score;
+                verificarBoss();
+            }
+        }, 100);
+
+        gameLoop = setInterval(checkCollision, 10);
+    }
 
 
     function resetElements() {
@@ -198,7 +198,7 @@ function startGame() {
 
         obstaculo.src = imagemObstaculo;
         obstaculo.style.animation = '';
-        obstaculo.style.animationDuration = ''; 
+        obstaculo.style.animationDuration = '';
         obstaculo.style.left = '';
 
         personagem.style.animation = '';
@@ -214,24 +214,24 @@ function startGame() {
     }
 
     function jump() {
-    if (!isPlaying) return;
-    if (jumpTip) jumpTip.style.opacity = '0';
+        if (!isPlaying) return;
+        if (jumpTip) jumpTip.style.opacity = '0';
 
-    // Pikachu: um pulo só
-    if (personagem.classList.contains('jump')) return;
-    personagem.classList.add('jump');
-    return;
+        // Pikachu: um pulo só
+        if (personagem.classList.contains('jump')) return;
+        personagem.classList.add('jump');
+        return;
     }
 
     // Mario: no máximo 2 pulos
     if (pulosFeitos >= 2) return;
     pulosFeitos += 1;
 
-personagem.addEventListener('animationend', (e) => {
-    if (e.animationName === 'jump-animation') {
-        personagem.classList.remove('jump');
-    } 
-});
+    personagem.addEventListener('animationend', (e) => {
+        if (e.animationName === 'jump-animation') {
+            personagem.classList.remove('jump');
+        }
+    });
 
     // O fim do pulo é detectado pela própria animação (nada de timers que desencontram)
     // personagem.addEventListener('animationend', (e) => {
@@ -252,11 +252,11 @@ personagem.addEventListener('animationend', (e) => {
         atualizarBarraCooldown();
         checarPowerup();
         if (bossAtivo) {
-        checarItem();
-        checarMoeda();
-        checarAtaque();
-        return; // durante o boss, os canos não contam
-    }
+            checarItem();
+            checarMoeda();
+            checarAtaque();
+            return; // durante o boss, os canos não contam
+        }
 
         // Mudou a dificuldade: reinicia o cano lá na frente e troca o fundo
         if (velocidadeObstaculo !== proximaVelocidade) {
@@ -274,7 +274,7 @@ personagem.addEventListener('animationend', (e) => {
 
         if (pipePosition <= 120 && pipePosition > 0 && marioPosition < 80 && !obstaculoDestruido && !invulneravel) {
             personagem.style.opacity = '0.4';
-            setTimeout(() => {personagem.style.opacity = '1';}, 300)
+            setTimeout(() => { personagem.style.opacity = '1'; }, 300)
             perderVida(pipePosition, marioPosition);
         }
 
@@ -317,13 +317,13 @@ personagem.addEventListener('animationend', (e) => {
         moeda.style.animation = 'none';
         moeda.style.visibility = 'hidden';
 
-        
+
         gameBoard.classList.remove('running');
 
-        
+
         obstaculo.style.animation = 'none';
         obstaculo.style.left = `${pipePosition}px`;
-        
+
         clearTimeout(timerBoss);
         clearTimeout(timerItem);
         ataque.style.animation = 'none';
@@ -362,24 +362,24 @@ personagem.addEventListener('animationend', (e) => {
                 moedas: moedas
             })
         })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
-                saveStatusMsg.textContent = 'Pontuação registrada no banco!';
-                saveStatusMsg.style.color = '#10b981';
-                if (data.ranking) {
-                    renderRanking(data.ranking, playerName, finalScore);
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    saveStatusMsg.textContent = 'Pontuação registrada no banco!';
+                    saveStatusMsg.style.color = '#10b981';
+                    if (data.ranking) {
+                        renderRanking(data.ranking, playerName, finalScore);
+                    }
+                } else {
+                    saveStatusMsg.textContent = '⚠️ ' + (data.message || 'Erro ao registrar.');
+                    saveStatusMsg.style.color = '#ef4444';
                 }
-            } else {
-                saveStatusMsg.textContent = '⚠️ ' + (data.message || 'Erro ao registrar.');
+            })
+            .catch(err => {
+                console.error('Erro na requisição:', err);
+                saveStatusMsg.textContent = '⚠️ Erro ao conectar ao servidor Laragon.';
                 saveStatusMsg.style.color = '#ef4444';
-            }
-        })
-        .catch(err => {
-            console.error('Erro na requisição:', err);
-            saveStatusMsg.textContent = '⚠️ Erro ao conectar ao servidor Laragon.';
-            saveStatusMsg.style.color = '#ef4444';
-        });
+            });
     }
 
     /**
@@ -428,6 +428,7 @@ personagem.addEventListener('animationend', (e) => {
                 <td class="ranking-pos">${medal}</td>
                 <td><strong>${escapeHtml(item.nome)}</strong></td>
                 <td>${parseInt(item.pontos, 10)} pts</td>
+                <td>🪙 ${parseInt(item.moedas, 10) || 0}</td>
             `;
 
             rankingBody.appendChild(tr);
@@ -457,12 +458,12 @@ personagem.addEventListener('animationend', (e) => {
             return;
         }
 
-    startModal.classList.remove('active');
-    selectCharacter.classList.add('active');
+        startModal.classList.remove('active');
+        selectCharacter.classList.add('active');
 
-    startModal.classList.remove('active');
+        startModal.classList.remove('active');
 
-    document.querySelector('.select-caracter').classList.add('active');
+        document.querySelector('.select-caracter').classList.add('active');
     });
 
     // Botão "VER RANKING" na tela inicial
@@ -509,7 +510,7 @@ personagem.addEventListener('animationend', (e) => {
                 e.preventDefault();
                 usarRaio();
             }
-}
+        }
     });
 
     // SELECIONAR PERSONAGENS
@@ -539,7 +540,7 @@ personagem.addEventListener('animationend', (e) => {
 
     document.getElementById('btn-mario')
         .addEventListener('click', selecionarMario);
-    
+
     obstaculo.addEventListener('animationiteration', () => {
         if (!isPlaying) return;
         obstaculoDestruido = false;
@@ -552,11 +553,11 @@ personagem.addEventListener('animationend', (e) => {
     });
     btnConfirmar.addEventListener('click', () => {
 
-    // Fecha a seleção de personagem
-    selectCharacter.classList.remove('active');
+        // Fecha a seleção de personagem
+        selectCharacter.classList.remove('active');
 
-    // Começa o jogo
-    // startGame();
+        // Começa o jogo
+        // startGame();
 
 
     });
@@ -572,7 +573,7 @@ personagem.addEventListener('animationend', (e) => {
     function atualizarCenario() {
         // Define a classe de dificuldade baseada na velocidade atual
         // difficulty.value = 'Fácil';
-        
+
         let nivelDificuldade = 'facil';
         if (velocidadeObstaculo === 1.5) {
             nivelDificuldade = 'medio';
@@ -580,6 +581,7 @@ personagem.addEventListener('animationend', (e) => {
             // difficulty.value = 'Médio';    
         } else if (velocidadeObstaculo === 1) {
             nivelDificuldade = 'dificil';
+            fundo1.style.visibility = 'hidden';
             // difficulty.value = 'Difícil';
         }
         // Aplica a classe combinada no fundo (Ex: "bg-pikachu-facil", "bg-mario-dificil")
@@ -598,43 +600,43 @@ personagem.addEventListener('animationend', (e) => {
         reiniciarMoeda();
     }
     function sortearMoeda() {
-    const altura = alturasMoeda[Math.floor(Math.random() * alturasMoeda.length)];
-    moeda.style.bottom = `${altura}px`;
-    moeda.style.visibility = 'visible';
-    moedaColetada = false;
-}
-
-function reiniciarMoeda() {
-    moeda.style.animation = 'none';
-    void moeda.offsetWidth;
-    moeda.style.animation = '';
-    moeda.style.animationDuration = `${velocidadeObstaculo}s`;
-    // metade do ciclo de diferença pro cano, pra nunca aparecerem juntos
-    moeda.style.animationDelay = `-${velocidadeObstaculo / 2}s`;
-    sortearMoeda();
-}
-
-function checarMoeda() {
-    if (moedaColetada) return;
-
-    const m = moeda.getBoundingClientRect();
-    const p = personagem.getBoundingClientRect();
-
-    const tocou =
-        m.right > p.left + 30 &&
-        m.left < p.right - 30 &&
-        m.bottom > p.top + 20 &&
-        m.top < p.bottom - 10;
-
-    if (tocou) {
-        moedaColetada = true;
-        moedas += multiplicadorMoeda;
-        coinsDisplay.textContent = Math.floor(moedas);
-        moeda.style.visibility = 'hidden';
+        const altura = alturasMoeda[Math.floor(Math.random() * alturasMoeda.length)];
+        moeda.style.bottom = `${altura}px`;
+        moeda.style.visibility = 'visible';
+        moedaColetada = false;
     }
+
+    function reiniciarMoeda() {
+        moeda.style.animation = 'none';
+        void moeda.offsetWidth;
+        moeda.style.animation = '';
+        moeda.style.animationDuration = `${velocidadeObstaculo}s`;
+        // metade do ciclo de diferença pro cano, pra nunca aparecerem juntos
+        moeda.style.animationDelay = `-${velocidadeObstaculo / 2}s`;
+        sortearMoeda();
     }
-        // ===== BOSS =====
-        function verificarBoss() {
+
+    function checarMoeda() {
+        if (moedaColetada) return;
+
+        const m = moeda.getBoundingClientRect();
+        const p = personagem.getBoundingClientRect();
+
+        const tocou =
+            m.right > p.left + 30 &&
+            m.left < p.right - 30 &&
+            m.bottom > p.top + 20 &&
+            m.top < p.bottom - 10;
+
+        if (tocou) {
+            moedaColetada = true;
+            moedas += multiplicadorMoeda;
+            coinsDisplay.textContent = Math.floor(moedas);
+            moeda.style.visibility = 'hidden';
+        }
+    }
+    // ===== BOSS =====
+    function verificarBoss() {
         if (bossAtivo) return;
 
         if (score >= proximoBoss) {
@@ -647,7 +649,7 @@ function checarMoeda() {
         bossMorrendo = false;
         bossVida = 3;
 
-        esconderPowerup(); // se um power-up estiver na tela, ele some (o efeito já ativo continua)
+        // esconderPowerup(); 
 
         // cada boss é mais difícil que o anterior
         if (bossFeitos === 0) {          // entre o Fácil e o Médio
@@ -685,7 +687,7 @@ function checarMoeda() {
         setTimeout(() => {
             mensagemBoss.style.opacity = '0';
             detalheBoss.style.opacity = '0';
-        }, 2200)
+        }, 5000)
 
         timerBoss = setTimeout(prepararAtaque, 1000);
         timerItem = setTimeout(lancarItem, 3000);
@@ -748,9 +750,10 @@ function checarMoeda() {
         const posAtaque = ataque.offsetLeft;
         const posPersonagem = +window.getComputedStyle(personagem).bottom.replace('px', '');
 
+
         if (posAtaque <= 120 && posAtaque > 0 && ataque.style.visibility !== 'hidden') {
-        // ataque alto: acerta quem pula / ataque baixo: acerta quem está no chão
-            if ((tipoAtaque === 'alto' && posPersonagem > 40) || (tipoAtaque === 'baixo' && posPersonagem < 80)) {
+            // ataque alto: acerta quem pula / ataque baixo: acerta quem está no chão
+            if ((tipoAtaque === 'alto' && posPersonagem > 40 && posPersonagem < 180) || (tipoAtaque === 'baixo' && posPersonagem < 80)) {
                 perderVida(posAtaque, posPersonagem);
                 if (isPlaying) ataque.style.visibility = 'hidden';
             }
@@ -816,7 +819,7 @@ function checarMoeda() {
         timerBoss = setTimeout(finalizarBoss, 2000);
     }
 
-    
+
 
     function resetBoss() {
         bossAtivo = false;
@@ -894,7 +897,7 @@ function checarMoeda() {
             obstaculoDestruido = true;
         }
     }
-        // ===== POWER-UPS =====
+    // ===== POWER-UPS =====
     function agendarPowerup() {
         clearTimeout(timerPowerup);
         timerPowerup = setTimeout(lancarPowerup, 8000 + Math.random() * 7000); // 8 a 15s
@@ -982,19 +985,19 @@ function checarMoeda() {
     // Sorteia nova altura toda vez que a moeda reaparece na direita
     moeda.addEventListener('animationiteration', sortearMoeda);
     function reiniciarObstaculo() {
-    obstaculo.style.animation = 'none';
-    void obstaculo.offsetWidth;
-    obstaculo.style.animation = '';
-    obstaculo.style.animationDuration = `${velocidadeObstaculo}s`;
-    reiniciarMoeda(); 
-}
+        obstaculo.style.animation = 'none';
+        void obstaculo.offsetWidth;
+        obstaculo.style.animation = '';
+        obstaculo.style.animationDuration = `${velocidadeObstaculo}s`;
+        reiniciarMoeda();
+    }
     btnConfirmar.addEventListener('click', () => {
         selectCharacter.classList.remove('active');
         atualizarLoja();
         loja.classList.add('active');
     });
     function atualizarLoja() {
-        
+
         const pMoeda = 30 + 15 * nivelMoeda;
         const pPulo = 30 + 15 * nivelPulo;
         const pVida = 30 + 15 * nivelVida;
@@ -1008,20 +1011,21 @@ function checarMoeda() {
         btnComprarMoeda.disabled = moedasTotal < pMoeda;
         btnComprarPulo.disabled = moedasTotal < pPulo;
         btnComprarVida.disabled = moedasTotal < pVida;
-        
 
-        if(contadorMoeda >= 3){
+
+        if (contadorMoeda >= 3) {
             btnComprarMoeda.disabled;
         }
-        if(contadorPulo >= 3){
+        if (contadorPulo >= 3) {
             btnComprarPulo.disabled;
         }
-        if(contadorVida >= 3){
+        if (contadorVida >= 3) {
             btnComprarVida.disabled;
         }
-        btnComprarMoeda.disabled = nivelMoeda >= 3;
+
+        btnComprarMoeda.disabled = nivelMoeda = 3;
         btnComprarPulo.disabled = nivelPulo = 3;
-        btnComprarVida.disabled = nivelVida >= 3;
+        btnComprarVida.disabled = nivelVida = 3;
 
     }
 
