@@ -6,7 +6,7 @@
     $port = '3306';
     $user = 'root';
     $pass = 'mysql';
-    $dbname = 'Mario_final_grupo_RAYD';
+    $dbname = 'mario_final_grupo_RAYD';
 
 
 // PRINCIPAL
@@ -42,11 +42,11 @@
             
         $pdo->exec(
             "CREATE TABLE IF NOT EXISTS `ranking`(
-        `id` INT AUTO_INCREMENT PRIMARY KEY,
-        `nome` VARCHAR(50) NOT NULL,
-        `pontos` INT NOT NULL,
-        `moedas` INT,
-        `data_registro` TIMESTAMP DEFAULT CURRENT_TIMESTAMP) "
+            `id` INT AUTO_INCREMENT PRIMARY KEY,
+            `moedas` INT,
+            `nome` VARCHAR(50) NOT NULL,
+            `pontos` INT NOT NULL,
+            `data_registro` TIMESTAMP DEFAULT CURRENT_TIMESTAMP) "
         );
         // isso previne sql injection pq cria a tabela dnv
 

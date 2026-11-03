@@ -131,6 +131,20 @@ document.addEventListener('DOMContentLoaded', () => {
         playerInput.value = savedName;
     }
 
+    function resetarProgresso() {
+        moedasTotal = 0;
+        nivelMoeda = 0;
+        nivelPulo = 0;
+        nivelVida = 0;
+        moedas = 0;
+        score = 0;
+
+        localStorage.removeItem('mario_jump_moedas_total');
+        localStorage.removeItem('mario_jump_nivel_moeda');
+        localStorage.removeItem('mario_jump_nivel_pulo');
+        localStorage.removeItem('mario_jump_nivel_vida');
+    }
+
     /**
      * Inicia uma nova rodada
      */
@@ -172,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
         agendarPowerup();
 
         scoreDisplay.textContent = '0';
-        hudPlayerName.textContent = currentPlayer || 'Jogador';
+        hudPlayerName.textContent = playerInput.value || 'Jogador';
 
         gameBoard.classList.add('running');
         reiniciarObstaculo(); // cano começa limpo e com 1s de folga (já reinicia a moeda também)
@@ -347,6 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Salva a pontuação no banco MySQL via PHP
         saveScore(currentPlayer, score);
+
     }
 
 
@@ -404,7 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
         rankingBody.innerHTML = '';
 
         if (!list || list.length === 0) {
-            rankingBody.innerHTML = '<tr><td colspan="3" class="loading-cell">Nenhuma pontuação gravada ainda. Jogue para ser o 1º!</td></tr>';
+            rankingBody.innerHTML = '<tr><td colspan="4" class="loading-cell">Nenhuma pontuação gravada ainda. Jogue para ser o 1º!</td></tr>';
             return;
         }
 
@@ -450,7 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Submit do Formulário de Início (INICIAR JOGO)
     startForm.addEventListener('submit', (e) => {
-        e.preventDefault(); // Impede o recarregamento da página
+        e.preventDefault();
 
         const nameValue = playerInput.value.trim();
         if (!nameValue) {
@@ -458,12 +473,17 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // nome diferente do último = jogador novo: zera o progresso
+        const nomeAnterior = localStorage.getItem('mario_jump_player');
+        if (nomeAnterior !== nameValue) {
+            resetarProgresso();
+        }
+
+        currentPlayer = nameValue;
+        localStorage.setItem('mario_jump_player', nameValue);
+
         startModal.classList.remove('active');
         selectCharacter.classList.add('active');
-
-        startModal.classList.remove('active');
-
-        document.querySelector('.select-caracter').classList.add('active');
     });
 
     // Botão "VER RANKING" na tela inicial
@@ -492,6 +512,32 @@ document.addEventListener('DOMContentLoaded', () => {
         gameoverModal.classList.remove('active');
         resetElements();
         resetBoss();
+
+        // ===== RESET DO JOGADOR ANTERIOR =====
+        currentPlayer = '';
+        score = 0;
+        moedas = 0;
+
+        moedasTotal = 0;
+        nivelMoeda = 0;
+        nivelPulo = 0;
+        nivelVida = 0;
+
+        localStorage.removeItem('mario_jump_moedas_total');
+        localStorage.removeItem('mario_jump_nivel_moeda');
+        localStorage.removeItem('mario_jump_nivel_pulo');
+        localStorage.removeItem('mario_jump_nivel_vida');
+        localStorage.removeItem('mario_jump_player');
+
+        // limpa o HUD
+        hudPlayerName.textContent = '---';
+        scoreDisplay.textContent = '0';
+        coinsDisplay.textContent = '0';
+        livesDisplay.textContent = '1';
+
+        // volta o personagem para o padrão
+        selecionarPikachu();
+
         startModal.classList.add('active');
         playerInput.value = '';
         playerInput.focus();
@@ -997,36 +1043,35 @@ document.addEventListener('DOMContentLoaded', () => {
         loja.classList.add('active');
     });
     function atualizarLoja() {
-
         const pMoeda = 30 + 15 * nivelMoeda;
         const pPulo = 30 + 15 * nivelPulo;
         const pVida = 30 + 15 * nivelVida;
 
         lojaMoedas.textContent = moedasTotal;
-        precoMoeda.textContent = pMoeda;
-        precoPulo.textContent = pPulo;
-        precoVida.textContent = pVida;
+        precoMoeda.textContent = `${pMoeda} moedas (${nivelMoeda}/3)`;
+        precoPulo.textContent = `${pPulo} moedas (${nivelPulo}/3)`;
+        precoVida.textContent = `${pVida} moedas (${nivelVida}/3)`;
 
-        // apaga o botão se não tiver moedas suficientes
-        btnComprarMoeda.disabled = moedasTotal < pMoeda;
-        btnComprarPulo.disabled = moedasTotal < pPulo;
-        btnComprarVida.disabled = moedasTotal < pVida;
+        // visual de "bloqueado" (o botão continua clicável para mostrar a mensagem)
+        btnComprarMoeda.classList.toggle('bloqueado', moedasTotal < pMoeda || nivelMoeda >= 3);
+        btnComprarPulo.classList.toggle('bloqueado', moedasTotal < pPulo || nivelPulo >= 3);
+        btnComprarVida.classList.toggle('bloqueado', moedasTotal < pVida || nivelVida >= 3);
 
+        // limpa mensagens antigas ao abrir a loja ou depois de uma compra
+        document.querySelectorAll('.msg-loja').forEach(m => m.classList.remove('visivel'));
+    }
 
-        if (contadorMoeda >= 3) {
-            btnComprarMoeda.disabled;
-        }
-        if (contadorPulo >= 3) {
-            btnComprarPulo.disabled;
-        }
-        if (contadorVida >= 3) {
-            btnComprarVida.disabled;
-        }
+    const timersMsgLoja = {};
 
-        btnComprarMoeda.disabled = nivelMoeda = 3;
-        btnComprarPulo.disabled = nivelPulo = 3;
-        btnComprarVida.disabled = nivelVida = 3;
+    function mostrarMensagemLoja(tipo, texto) {
+        const msg = document.getElementById('msg-' + tipo);
+        msg.textContent = texto;
+        msg.classList.add('visivel');
 
+        clearTimeout(timersMsgLoja[tipo]);
+        timersMsgLoja[tipo] = setTimeout(() => {
+            msg.classList.remove('visivel');
+        }, 2500); // some sozinha depois de 2,5s
     }
 
     function comprar(tipo) {
@@ -1034,10 +1079,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (tipo === 'moeda') nivel = nivelMoeda;
         if (tipo === 'pulo') nivel = nivelPulo;
 
-        const preco = 30 + 15 * nivel;
-        if (moedasTotal < preco) return;
+        if (nivel >= 3) {
+            mostrarMensagemLoja(tipo, 'Nível máximo!');
+            return;
+        }
 
-        moedasTotal -= preco; // subtrai do total
+        const preco = 30 + 15 * nivel;
+        if (moedasTotal < preco) {
+            mostrarMensagemLoja(tipo, `Moedas insuficientes! Faltam ${preco - moedasTotal}`);
+            return;
+        }
+
+        moedasTotal -= preco;
 
         if (tipo === 'moeda') nivelMoeda += 1;
         else if (tipo === 'pulo') nivelPulo += 1;

@@ -5,7 +5,7 @@
     $rankingInicial = [];
     try {
         $stmt = $pdo->query("
-            SELECT id, nome, moedas, pontos, DATE_FORMAT(data_registro, '%d/%m/%Y %H:%i') as data 
+            SELECT id, moedas, nome, pontos, DATE_FORMAT(data_registro, '%d/%m/%Y %H:%i') as data 
             FROM ranking 
             ORDER BY pontos DESC, id ASC 
             LIMIT 10
@@ -122,21 +122,26 @@
         <h1 class="select-title">Loja de melhorias</h1>
         <p>Suas moedas: <span id="loja-moedas">0</span></p>
 
-        <button type="button" class="btnSelect" id="btn-comprar-moeda">
-            Moedas 1.5x mais - <span id="preco-moeda">30 moedas (0/3)</span>
-        </button>
+        <div class="loja-item">
+            <button type="button" class="btnSelect" id="btn-comprar-moeda">
+                Moedas 1.5x mais - <span id="preco-moeda">30 moedas (0/3)</span>
+            </button>
+            <span class="msg-loja" id="msg-moeda"></span>
+        </div>
 
-        <button type="button" class="btnSelect" id="btn-comprar-pulo">
-            Pulo 1.2x mais alto - <span id="preco-pulo">30 moedas (0/3)</span>
-        </button>
+        <div class="loja-item">
+            <button type="button" class="btnSelect" id="btn-comprar-pulo">
+                Pulo 1.2x mais alto - <span id="preco-pulo">30 moedas (0/3)</span>
+            </button>
+            <span class="msg-loja" id="msg-pulo"></span>
+        </div>
 
-        <button type="button" class="btnSelect" id="btn-comprar-vida">
-            ❤️ +1 coração de vida - <span id="preco-vida">30 moedas (0/3)</span>
-        </button>
-        
-        <h3 class="textoBloqueado">Nao podi</h3>
-
-
+        <div class="loja-item">
+            <button type="button" class="btnSelect" id="btn-comprar-vida">
+                ❤️ +1 coração de vida - <span id="preco-vida">30 moedas (0/3)</span>
+            </button>
+            <span class="msg-loja" id="msg-vida"></span>
+        </div>
 
         <button type="button" class="btn btn-primary" id="btn-jogar-loja">JOGAR</button>
     </div>
@@ -210,7 +215,6 @@
                                             <?= $i === 0 ? '🥇 1º' : ($i === 1 ? '🥈 2º' : ($i === 2 ? '🥉 3º' : ($i + 1) . 'º')) ?>
                                         </td>
                                         <td><strong><?= htmlspecialchars($row['nome']) ?></strong></td>
-                                        <td><?= (int)$row['pontos'] ?> pts</td>
                                         <td><?= (int)$row['pontos'] ?> pts</td>
                                         <td>🪙 <?= (int)$row['moedas'] ?></td>
                                     </tr>
