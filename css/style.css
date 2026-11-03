@@ -142,6 +142,7 @@ body {
 }
 
 .personagem {
+    image-rendering: auto;
     width: 150px;
     position: absolute;
     padding-bottom: 23px;
@@ -642,7 +643,10 @@ body {
 
 /* descrições: escondidas por padrão */
 .infoCharacterPikachu,
-.infoCharacterMario {
+.infoCharacterMario,
+.infoCharacterHarry,
+.infoCharacterNaruto,
+.infoCharacterJerry {
     display: none;
     max-width: 520px;
     padding: 0 20px;
@@ -662,6 +666,26 @@ body {
     display: block;
     color: #ff6a4d;
     animation: fadeIn 0.3s ease;
+}
+.select-caracter:has(#btn-harry.selecionado) .infoCharacterHarry {
+    display: block; color: #e0b93a; animation: fadeIn 0.3s ease;
+}
+.select-caracter:has(#btn-naruto.selecionado) .infoCharacterNaruto {
+    display: block; color: #ff8c00; animation: fadeIn 0.3s ease;
+}
+.select-caracter:has(#btn-jerry.selecionado) .infoCharacterJerry {
+    display: block; color: #d9a066; animation: fadeIn 0.3s ease;
+}
+
+#btn-harry.selecionado  { border-color: #e0b93a; box-shadow: 0 0 15px rgba(224, 185, 58, 0.6); }
+#btn-naruto.selecionado { border-color: #ff8c00; box-shadow: 0 0 15px rgba(255, 140, 0, 0.6); }
+#btn-jerry.selecionado  { border-color: #d9a066; box-shadow: 0 0 15px rgba(217, 160, 102, 0.6); }
+
+.lista-personagens {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
 }
 .btnSelect img {
     width: 60px;
@@ -695,6 +719,20 @@ body {
 .game-board.bg-mario-dificil {
     background-image: url('../assets/fundo-mario-dificil.jpg');
 }
+/* Cenários do Harry */
+.game-board.bg-harry-facil   { background-image: url('../assets/harry-fundo-facil.png'); }
+.game-board.bg-harry-medio   { background-image: url('../assets/harry-fundo-medio.png'); }
+.game-board.bg-harry-dificil { background-image: url('../assets/harry-fundo-dificil.png'); }
+
+/* Cenários do Naruto */
+.game-board.bg-naruto-facil   { background-image: url('../assets/naruto-fundo-facil.jpg'); }
+.game-board.bg-naruto-medio   { background-image: url('../assets/naruto-fundo-medio.jpg'); }
+.game-board.bg-naruto-dificil { background-image: url('../assets/naruto-fundo-dificil.jpg'); }
+
+/* Cenários do Jerry */
+.game-board.bg-jerry-facil   { background-image: url('../assets/jerry-fundo-facil.png'); }
+.game-board.bg-jerry-medio   { background-image: url('../assets/jerry-fundo-medio.png'); }
+.game-board.bg-jerry-dificil { background-image: url('../assets/jerry-fundo-dificil.png'); }
 .moeda {
     position: absolute;
     right: -80px;
@@ -991,4 +1029,65 @@ body {
 .btnSelect.bloqueado:hover {
     transform: none;
     background-color: #2b2b2b;
+}
+/* NARUTO: fumaça e kunai */
+.fumaca {
+    display: none;
+    position: absolute;
+    left: 20px;
+    bottom: 0;
+    width: 150px;
+    z-index: 11;
+    pointer-events: none;
+}
+.kunai-arremesso {
+    display: none;
+    position: absolute;
+    left: 140px;
+    width: 50px;
+    z-index: 12;
+    pointer-events: none;
+}
+.kunai-arremesso.lancada { animation: kunai-voa 0.4s linear; }
+@keyframes kunai-voa {
+    from { transform: translateX(0); }
+    to   { transform: translateX(700px); }
+}
+.personagem-kunai { filter: drop-shadow(0 0 10px #ff8c00); }  /* brilho = está com kunai */
+
+/* HARRY: varinha (esconde as camadas, cano e moeda por 5s) */
+.game-board:has(.personagem-varinha) .camada { visibility: hidden; }
+.personagem-varinha ~ .obstaculo,
+.personagem-varinha ~ .moeda { opacity: 0; }
+
+.btn-sobre {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+}
+/* HARRY: barra de duração do voo (ao lado da barra de cooldown) */
+.barra-voo {
+    display: none;
+    position: absolute;
+    top: 10px;
+    left: 220px;
+    width: 150px;
+    height: 14px;
+    background: #121524;
+    border: 2px solid #b388ff;
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 20;
+}
+.barra-voo-fill {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, #e0c7ff, #9c5cff);
+}
+
+/* HARRY: as colinas viram outro elemento de fundo */
+.game-board.bg-harry-facil .montanha-fundo,
+.game-board.bg-harry-medio .montanha-fundo,
+.game-board.bg-harry-dificil .montanha-fundo {
+    background-image: url('../assets/elementoFundoHarry.png');
 }

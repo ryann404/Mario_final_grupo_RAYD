@@ -78,8 +78,15 @@
 
             <div class="barra-cooldown" id="barra-cooldown">
             <div class="barra-cooldown-fill" id="barra-cooldown-fill"></div>
+
+            <div class="barra-voo" id="barra-voo">
+            <div class="barra-voo-fill" id="barra-voo-fill"></div>
+            </div>
+            
             </div>
             <img src="assets/raioSkillPikachu.png" class="raio-skill" id="raio-skill" alt="Raio">
+            <img src="assets/fumaca.png" class="fumaca" id="fumaca" alt="Fumaça">
+            <img src="assets/kunai.png" class="kunai-arremesso" id="kunai-arremesso" alt="Kunai">
 
             <img src="assets/marioStar.png" class="powerup" id="powerup" alt="Power-up">
 
@@ -97,6 +104,7 @@
 
         <h1 class="select-title">Selecione um jogador</h1>
 
+        <div class="primeiros">
         <button type="button" class="btnSelect" id="btn-pikachu">
             <img src="assets/Running-Pikachu-GIF.webp" alt="Pikachu">
             <p>Pikachu</p>
@@ -106,11 +114,33 @@
             <img src="assets/mario.gif" alt="Mario">
             <p>Mario</p>
         </button>
+        </div>
+        <div class="lista-personagens">
+    <!-- btn-pikachu e btn-mario aqui dentro, sem mudar nada -->
+
+            <button type="button" class="btnSelect" id="btn-harry">
+                <img src="assets/harryVoando.png" alt="Harry">
+                <p>Harry</p>
+            </button>
+
+            <button type="button" class="btnSelect" id="btn-naruto">
+                <img src="assets/narutoCorrendo.gif" alt="Naruto">
+                <p>Naruto</p>
+            </button>
+
+            <button type="button" class="btnSelect" id="btn-jerry">
+                <img src="assets/jerryCorrendo.gif" alt="Jerry">
+                <p>Jerry</p>
+            </button>
+        </div>
 
         <h3 class="infoCharacterPikachu">Habilidade "Choque do Trovão": Dispara um raio nos obstáculos e nos chefes com um cooldown de 5 segundos</h3>
         <!-- <h3 class="infoCharacterMario">Habilidade "Pulo Duplo": Dá um segundo salto, podendo te dar vantagens contra ataques altos e ao pular os obstáculos</h3> -->
         <!-- EU COLOQUEI PULO DUPLO, MAS DO ND ELE TRAVOU -->
         <h3 class="infoCharacterMario">Gordinho Gostoso</h3>
+        <h3 class="infoCharacterHarry">Habilidade "Vassoura Voadora": voa por 5s (cooldown de 15s) e você controla a altura. Power-up: varinha muda o cenário e nada aparece por 5s.</h3>
+        <h3 class="infoCharacterNaruto">Habilidade "Clone das Sombras": ao perder a última vida, ganha uma segunda chance. Power-up: kunai (tecla X) remove um cano ou tira 1 vida do boss.</h3>
+        <h3 class="infoCharacterJerry">Habilidade "Queijo": a cada 40s aparece um queijo que recupera 1 coração.</h3>
 
         <button type="button" class="btn btn-primary" id="btn-confirmar-personagem">
             CONFIRMAR
@@ -170,6 +200,7 @@
                 <div class="modal-actions">
                     <button type="submit" class="btn btn-primary" id="btn-start">INICIAR JOGO</button>
                     <button type="button" class="btn btn-secondary" id="btn-view-ranking">VER RANKING</button>
+                    <a href="site/index.html" class="btn btn-secondary btn-sobre" id="btn-sobre-nos">SOBRE NÓS</a>
                 </div>
             </form>
 

@@ -6,6 +6,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const hudPlayerName = document.getElementById('hud-player-name');
     const scoreDisplay = document.getElementById('score-display');
     const jumpTip = document.getElementById('jump-tip');
+    // ===== ÁUDIOS =====
+    const somMoeda = new Audio('assets/moeda.wav');
+    const somDano = new Audio('assets/dano.wav');
+    const somMorrendo = new Audio('assets/morrendo.wav');
+    const somPulo = new Audio('assets/pulando.wav');
+    const musicaFundo = new Audio('assets/videoplayback.wav');
+    musicaFundo.loop = true;
+    musicaFundo.volume = 0.4;
+
+    function tocarSom(audio) {
+        audio.currentTime = 0;
+        audio.play().catch(() => { });
+    }
 
     const loja = document.getElementById('loja');
     const lojaMoedas = document.getElementById('loja-moedas');
@@ -100,6 +113,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let timerPoderFim = null;  // encerra o efeito    // 5 segundos
     let obstaculoDestruido = false;
 
+    const fumaca = document.getElementById('fumaca');
+    const kunaiArremesso = document.getElementById('kunai-arremesso');
+    const btnHarry = document.getElementById('btn-harry');
+    const btnNaruto = document.getElementById('btn-naruto');
+    const btnJerry = document.getElementById('btn-jerry');
+
+    let segundaChance = false;  // Naruto
+    let temKunai = false;       // Naruto
+    let voando = false;         // Harry
+    let subindo = false;        // Harry (segurando Espaço/↑)
+    let fimVoo = 0;             // Harry
+
 
 
     let moedasTotal = parseInt(localStorage.getItem('mario_jump_moedas_total'), 10) || 0;
@@ -166,14 +191,19 @@ document.addEventListener('DOMContentLoaded', () => {
         clearInterval(scoreLoop);
 
         isPlaying = true;
+        musicaFundo.currentTime = 0;
+        musicaFundo.play().catch(() => { });
         score = 0;
         velocidadeObstaculo = 2;
         proximaVelocidade = 2;
 
         resetElements();
         ultimoRaio = 0; // raio começa pronto
-        barraCooldown.style.display = personagemAtual === 'pikachu' ? 'block' : 'none';
+        segundaChance = false;
+
+        barraCooldown.style.display = (personagemAtual === 'pikachu' || personagemAtual === 'harry') ? 'block' : 'none';
         // se for o pikachu, tem barra, se for outro personagem, nao tem barra
+
 
         resetBoss();
         bossFeitos = 0;
@@ -209,6 +239,8 @@ document.addEventListener('DOMContentLoaded', () => {
         personagem.classList.remove('jump-duplo');
         clearTimeout(timerPulo);
         pulosFeitos = 0;
+        voando = false;
+        subindo = false;
 
         obstaculo.src = imagemObstaculo;
         obstaculo.style.animation = '';
@@ -229,11 +261,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function jump() {
         if (!isPlaying) return;
+        if (voando) return;
         if (jumpTip) jumpTip.style.opacity = '0';
 
         // Pikachu: um pulo só
         if (personagem.classList.contains('jump')) return;
         personagem.classList.add('jump');
+        tocarSom(somPulo);
         return;
     }
 
@@ -264,6 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function checkCollision() {
         if (!isPlaying) return;
         atualizarBarraCooldown();
+        moverVoo();
         checarPowerup();
         if (bossAtivo) {
             checarItem();
@@ -302,10 +337,19 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             personagem.style.opacity = '1';
         }, 300)
+        // NARUTO: segunda chance (só 1 vez por partida)
+        if (vidas == 0 && personagemAtual === 'naruto' && !segundaChance) {
+            segundaChance = true;
+            vidas = 1;
+            livesDisplay.textContent = vidas;
+            fumaca.style.display = 'block';
+            setTimeout(() => { fumaca.style.display = 'none'; }, 700);
+        }
         if (vidas <= 0) {
             triggerGameOver(pos, altura);
             return;
         }
+        tocarSom(somDano);
 
         // perdeu um coração mas continua: o cano some até o próximo ciclo
         obstaculoDestruido = true;
@@ -315,6 +359,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function triggerGameOver(pipePosition, marioPosition) {
 
         bossAtivo = false;
+
+        musicaFundo.pause();
+        musicaFundo.currentTime = 0;
+        tocarSom(somMorrendo);
 
         isPlaying = false;
 
@@ -548,23 +596,40 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.code === 'Space' || e.key === ' ' || e.code === 'ArrowUp') {
             if (isPlaying) {
                 e.preventDefault();
-                jump();
+                if (voando) { subindo = true; } else { jump(); }
             }
         }
         if (e.code === 'KeyZ') {
             if (isPlaying) {
                 e.preventDefault();
-                usarRaio();
+                usarRaio();    // só funciona no Pikachu
+                iniciarVoo();  // só funciona no Harry
             }
+        }
+        if (e.code === 'KeyX') {
+            if (isPlaying) {
+                e.preventDefault();
+                usarKunai();   // só funciona no Naruto
+            }
+        }
+    });
+
+    document.addEventListener('keyup', (e) => {
+        if (e.code === 'Space' || e.key === ' ' || e.code === 'ArrowUp') {
+            subindo = false;
         }
     });
 
     // SELECIONAR PERSONAGENS
 
 
+    function limparSelecao() {
+        document.querySelectorAll('#select-caracter .btnSelect').forEach(b => b.classList.remove('selecionado'));
+    }
+
     function selecionarPikachu() {
+        limparSelecao();
         btnPikachu.classList.add('selecionado');
-        btnMario.classList.remove('selecionado');
         personagemAtual = 'pikachu';
         imagemPersonagem = 'assets/Running-Pikachu-GIF.webp';
         imagemMorte = 'assets/pikachuDerrotado.jpg';
@@ -572,13 +637,50 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function selecionarMario() {
+        limparSelecao();
         btnMario.classList.add('selecionado');
-        btnPikachu.classList.remove('selecionado');
         personagemAtual = 'mario';
         imagemPersonagem = 'assets/mario.gif';
         imagemMorte = 'assets/marioDerrotado.png';
         imagemObstaculo = 'assets/canoMario.png';
     }
+
+    function selecionarHarry() {
+        limparSelecao();
+        btnHarry.classList.add('selecionado');
+        personagemAtual = 'harry';
+        imagemPersonagem = 'assets/harryVoando.png';
+        imagemMorte = 'assets/harryDerrotado.png';
+        imagemObstaculo = 'assets/obstaculoHarry.png';
+        fundo2 = 'assets/fundo2Harry.png';
+    }
+
+    function selecionarNaruto() {
+        limparSelecao();
+        btnNaruto.classList.add('selecionado');
+        personagemAtual = 'naruto';
+        imagemPersonagem = 'assets/narutoCorrendo.gif';
+        imagemMorte = 'assets/narutoDerrotado.png';
+        imagemObstaculo = 'assets/obstaculoNaruto.png';
+    }
+
+    function selecionarJerry() {
+        limparSelecao();
+        btnJerry.classList.add('selecionado');
+        personagemAtual = 'jerry';
+        imagemPersonagem = 'assets/jerryCorrendo.gif';
+        imagemMorte = 'assets/jerryDerrotado.png';
+        imagemObstaculo = 'assets/obstaculoJerry.png';
+    }
+
+    btnPikachu.classList.add('selecionado');
+
+    btnPikachu.addEventListener('click', selecionarPikachu);
+    btnMario.addEventListener('click', selecionarMario);
+    btnHarry.addEventListener('click', selecionarHarry);
+    btnNaruto.addEventListener('click', selecionarNaruto);
+    btnJerry.addEventListener('click', selecionarJerry);
+
     btnPikachu.classList.add('selecionado');
 
     document.getElementById('btn-pikachu')
@@ -635,16 +737,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    function reiniciarObstaculo() {
-        obstaculoDestruido = false;
-        obstaculo.style.visibility = 'visible';
-        obstaculo.style.animation = 'none';
-        void obstaculo.offsetWidth;
-        obstaculo.style.animation = '';
-        obstaculo.style.animationDuration = `${velocidadeObstaculo}s`;
-        ignorarColisaoAte = Date.now() + 300;
-        reiniciarMoeda();
-    }
+    // function reiniciarObstaculo() {
+    //     obstaculoDestruido = false;
+    //     obstaculo.style.visibility = 'visible';
+    //     obstaculo.style.animation = 'none';
+    //     void obstaculo.offsetWidth;
+    //     obstaculo.style.animation = '';
+    //     obstaculo.style.animationDuration = `${velocidadeObstaculo}s`;
+    //     ignorarColisaoAte = Date.now() + 300;
+    //     reiniciarMoeda();
+    // }
     function sortearMoeda() {
         const altura = alturasMoeda[Math.floor(Math.random() * alturasMoeda.length)];
         moeda.style.bottom = `${altura}px`;
@@ -663,7 +765,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function checarMoeda() {
-        if (moedaColetada) return;
+        if (moedaColetada || personagem.classList.contains('personagem-varinha')) return;
 
         const m = moeda.getBoundingClientRect();
         const p = personagem.getBoundingClientRect();
@@ -675,6 +777,7 @@ document.addEventListener('DOMContentLoaded', () => {
             m.top < p.bottom - 10;
 
         if (tocou) {
+            tocarSom(somMoeda);
             moedaColetada = true;
             moedas += multiplicadorMoeda;
             coinsDisplay.textContent = Math.floor(moedas);
@@ -683,7 +786,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // ===== BOSS =====
     function verificarBoss() {
-        if (bossAtivo) return;
+        if (bossAtivo || personagem.classList.contains('personagem-varinha')) return;
 
         if (score >= proximoBoss) {
             iniciarBoss();
@@ -911,6 +1014,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function atualizarBarraCooldown() {
         let porcentagem = ((Date.now() - ultimoRaio) / cooldownRaio) * 100;
         if (porcentagem > 100) porcentagem = 100;
+        if (porcentagem < 0) porcentagem = 0;
         barraCooldownFill.style.width = `${porcentagem}%`;
     }
 
@@ -943,17 +1047,85 @@ document.addEventListener('DOMContentLoaded', () => {
             obstaculoDestruido = true;
         }
     }
+    // HARRY: vassoura voadora (5s de voo, 15s de cooldown)
+    function iniciarVoo() {
+        if (!isPlaying || personagemAtual !== 'harry' || voando) return;
+        if (Date.now() - ultimoRaio < cooldownRaio) return; // em cooldown
+
+        voando = true;
+        fimVoo = Date.now() + 5000;
+        ultimoRaio = fimVoo;  // a barra só começa a encher quando o voo acaba
+        personagem.classList.remove('jump');
+        personagem.src = 'assets/harryVoando.png';
+    }
+
+    // roda a cada 10ms dentro do checkCollision
+    function moverVoo() {
+        if (!voando) return;
+        if (Date.now() >= fimVoo) subindo = false; // acabou o tempo: só desce
+
+        const atual = parseFloat(personagem.style.bottom) || 0;
+        // limite: o topo do personagem encosta na barra de cooldown
+        const limite = gameBoard.clientHeight - (barraCooldown.offsetTop + barraCooldown.offsetHeight) - personagem.offsetHeight;
+
+        let novo = atual + (subindo ? 4 : -4);
+        if (novo > limite) novo = limite;
+        if (novo < 0) novo = 0;
+        personagem.style.bottom = `${novo}px`;
+
+        // acabou o tempo e já pousou: volta a correr
+        if (novo === 0 && Date.now() >= fimVoo) {
+            voando = false;
+            personagem.src = imagemPersonagem;
+        }
+    }
+
+    // NARUTO: lança a kunai (1 por kunai coletada)
+    function usarKunai() {
+        if (!isPlaying || personagemAtual !== 'naruto' || !temKunai) return;
+        if (bossAtivo && bossMorrendo) return;
+        if (!bossAtivo) {
+            if (obstaculoDestruido) return;
+            if (obstaculo.offsetLeft <= 0 || obstaculo.offsetLeft >= gameBoard.offsetWidth) return;
+        }
+
+        temKunai = false;
+        personagem.classList.remove('personagem-kunai');
+
+        const altura = +window.getComputedStyle(personagem).bottom.replace('px', '');
+        kunaiArremesso.style.bottom = `${altura + 50}px`;
+        kunaiArremesso.style.display = 'block';
+        kunaiArremesso.classList.remove('lancada');
+        void kunaiArremesso.offsetWidth;
+        kunaiArremesso.classList.add('lancada');
+        setTimeout(() => { kunaiArremesso.style.display = 'none'; }, 400);
+
+        if (bossAtivo) {
+            danoBoss(); // tira 1 de vida do boss
+        } else {
+            obstaculo.style.visibility = 'hidden';
+            obstaculoDestruido = true;
+        }
+    }
     // ===== POWER-UPS =====
     function agendarPowerup() {
         clearTimeout(timerPowerup);
-        timerPowerup = setTimeout(lancarPowerup, 8000 + Math.random() * 7000); // 8 a 15s
+        const espera = personagemAtual === 'jerry' ? 40000 : 15000 + Math.random() * 5000;
+        timerPowerup = setTimeout(lancarPowerup, espera);
     }
 
     function lancarPowerup() {
         if (!isPlaying) return;
         if (bossAtivo || powerupAtivo) { agendarPowerup(); return; } // não aparece no boss nem com poder ativo
 
-        powerup.src = personagemAtual === 'mario' ? 'assets/marioStar.png' : 'assets/pimenta.png';
+        const imagensPowerup = {
+            mario: 'assets/marioStar.png',
+            pikachu: 'assets/pimenta.png',
+            harry: 'assets/varinha.png',
+            naruto: 'assets/kunai.png',
+            jerry: 'assets/queijo.png'
+        };
+        powerup.src = imagensPowerup[personagemAtual];
         powerup.style.bottom = `${alturasMoeda[Math.floor(Math.random() * alturasMoeda.length)]}px`;
         powerup.style.display = 'block';
         powerupNaTela = true;
@@ -994,20 +1166,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function ativarPowerup() {
         clearTimeout(timerPoderFim);
+
+        // JERRY: queijo recupera 1 coração (não passa do máximo)
+        if (personagemAtual === 'jerry') {
+            if (vidas < 1 + nivelVida) {
+                vidas += 1;
+                livesDisplay.textContent = vidas;
+            }
+            agendarPowerup();
+            return;
+        }
+
+        // NARUTO: pegou a kunai (fica guardada até apertar X)
+        if (personagemAtual === 'naruto') {
+            temKunai = true;
+            personagem.classList.add('personagem-kunai');
+            agendarPowerup();
+            return;
+        }
+
         const mario = personagemAtual === 'mario';
-        const duracao = mario ? 5000 : 15000;
+        const harry = personagemAtual === 'harry';
+        const duracao = (mario || harry) ? 5000 : 15000;
 
         if (mario) {
             invulneravel = true;
             personagem.classList.add('personagem-estrela');
+        } else if (harry) {
+            invulneravel = true;
+            personagem.classList.add('personagem-varinha');
+            gameBoard.style.backgroundImage = "url('assets/fundoPowerUpHarry.png')";
         } else {
-            cooldownRaio = cooldownBase / 2;   // cooldown cai pela metade (2,5s)
+            cooldownRaio = cooldownBase / 2;
             personagem.classList.add('personagem-pimenta');
         }
         powerupAtivo = true;
 
-        // barra: some sozinha quando acaba
-        barraPoderFill.style.background = mario
+        barraPoderFill.style.background = (mario || harry)
             ? 'linear-gradient(180deg, #fff3a0, #ffcc00)'
             : 'linear-gradient(180deg, #ff8a80, #e53935)';
         barraPoder.style.display = 'block';
@@ -1015,15 +1210,21 @@ document.addEventListener('DOMContentLoaded', () => {
         void barraPoderFill.offsetWidth;
         barraPoderFill.style.animation = `poder-acaba ${duracao}ms linear forwards`;
 
-        timerPoderFim = setTimeout(encerrarPowerup, duracao);
+        // ao acabar, já agenda o próximo power-up
+        timerPoderFim = setTimeout(() => {
+            encerrarPowerup();
+            agendarPowerup();
+        }, duracao);
     }
 
     function encerrarPowerup() {
         clearTimeout(timerPoderFim);
         invulneravel = false;
         powerupAtivo = false;
-        cooldownRaio = cooldownBase;
-        personagem.classList.remove('personagem-estrela', 'personagem-pimenta');
+        temKunai = false;
+        cooldownRaio = personagemAtual === 'harry' ? 15000 : cooldownBase; // Harry tem cooldown de 15s
+        gameBoard.style.backgroundImage = '';  // volta o fundo normal (Harry)
+        personagem.classList.remove('personagem-estrela', 'personagem-pimenta', 'personagem-kunai', 'personagem-varinha');
         barraPoder.style.display = 'none';
         barraPoderFill.style.animation = 'none';
     }
